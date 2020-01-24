@@ -1,0 +1,19 @@
+FROM node:10-alpine
+
+RUN apk --no-cache add --virtual native-deps \
+  g++ gcc libgcc libstdc++ linux-headers autoconf automake make nasm python git tzdata && \
+  npm install --quiet node-gyp -g
+
+RUN ln -s /usr/share/zoneinfo/America/Phoenix /etc/localtime
+RUN echo "America/Phoenix" > /etc/timezone
+
+RUN mkdir -p /home/apollo/app
+WORKDIR /home/apollo/app
+COPY ./package*.json ./
+RUN npm install
+
+ENV NODE_ENV=development
+
+EXPOSE 3000
+CMD [ "npm", "run", "docker-dev" ]
+HEALTHCHECK --start-period=15s --interval=1m --timeout=5s CMD ["node", "healthcheck"]

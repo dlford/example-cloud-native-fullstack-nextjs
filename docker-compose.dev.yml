@@ -1,0 +1,82 @@
+version: '3.7'
+
+services:
+  db_dev:
+    volumes:
+      - type: volume
+        source: db-data_dev
+        target: /data/db
+      - type: volume
+        source: db-config_dev
+        target: /data/configdb
+    networks:
+      net1:
+        aliases:
+          - db
+    ports:
+      - '2999:27017'
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+  server_dev:
+    depends_on:
+      - db_dev
+    volumes:
+      - type: volume
+        source: server-node_modules_dev
+        target: /home/apollo/app/node_modules
+      - type: bind
+        source: ./server
+        target: /home/apollo/app
+    environment:
+      - DATABASE_URL=mongodb://db:27017/cloud-native-next
+      - PORT=3000
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    networks:
+      net1:
+        aliases:
+          - server
+  client_dev:
+    depends_on:
+      - server_dev
+    volumes:
+      - type: volume
+        source: client-node_modules_dev
+        target: /home/nextjs/app/node_modules
+      - type: volume
+        source: client-cache_dev
+        target: /home/nextjs/app/.next
+      - type: bind
+        source: ./client
+        target: /home/nextjs/app
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    networks:
+      net1:
+        aliases:
+          - client
+  nginx_dev:
+    depends_on:
+      - server_dev
+      - client_dev
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    networks:
+      net1:
+        aliases:
+          - nginx
+networks:
+  net1:
+    name: cloud-native-next
+volumes:
+  db-data_dev:
+  db-config_dev:
+  server-node_modules_dev:
+  client-node_modules_dev:
+  client-cache_dev:

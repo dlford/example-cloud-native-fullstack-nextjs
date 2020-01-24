@@ -1,0 +1,60 @@
+version: '3.7'
+
+services:
+  db_prod:
+    volumes:
+      - type: volume
+        source: db-data_prod
+        target: /data/db
+      - type: volume
+        source: db-config_prod
+        target: /data/configdb
+    networks:
+      net1:
+        aliases:
+          - db
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+  server_prod:
+    depends_on:
+      - db_prod
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=mongodb://db:27017/cloud-native-next
+      - PORT=3000
+    networks:
+      net1:
+        aliases:
+          - server
+  client_prod:
+    depends_on:
+      - server_prod
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    networks:
+      net1:
+        aliases:
+          - client
+  nginx_prod:
+    depends_on:
+      - server_prod
+      - client_prod
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    networks:
+      net1:
+        aliases:
+          - nginx
+networks:
+  net1:
+    name: cloud-native-next
+volumes:
+  db-data_prod:
+  db-config_prod:

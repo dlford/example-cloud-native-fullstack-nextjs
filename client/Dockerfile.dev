@@ -1,0 +1,16 @@
+FROM node:10-alpine
+
+RUN apk --no-cache add --virtual native-deps tzdata
+RUN ln -s /usr/share/zoneinfo/America/Phoenix /etc/localtime
+RUN echo "America/Phoenix" > /etc/timezone
+
+RUN mkdir -p /home/nextjs/app
+WORKDIR /home/nextjs/app
+COPY ./package*.json ./
+RUN npm install
+
+ENV NODE_ENV=development
+
+EXPOSE 3000
+CMD [ "npm", "run", "dev" ]
+HEALTHCHECK --start-period=15s --interval=1m --timeout=5s CMD ["node", "healthcheck"]

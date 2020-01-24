@@ -1,0 +1,27 @@
+{
+  "name": "cloud-native-next",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "docker-compose -f docker-compose.dev.yml up --remove-orphans -d",
+    "stop:dev": "docker-compose -f docker-compose.dev.yml stop",
+    "clean:dev": "docker-compose -f docker-compose.dev.yml down --rmi local --volumes --remove-orphans",
+    "build:dev": "docker-compose -f docker-compose.dev.yml build",
+    "start:prod": "docker-compose -f docker-compose.yml up --force-recreate --remove-orphans -d",
+    "stop:prod": "docker-compose -f docker-compose.yml stop",
+    "clean:prod": "docker-compose -f docker-compose.yml down --rmi local --volumes --remove-orphans",
+    "build:prod": "docker-compose -f docker-compose.yml build",
+    "build:prod:db": "docker-compose -f docker-compose.yml build db_prod",
+    "build:prod:server": "docker-compose -f docker-compose.yml build server_prod",
+    "build:prod:client": "docker-compose -f docker-compose.yml build client_prod",
+    "build:prod:nginx": "docker-compose -f docker-compose.yml build nginx_prod"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.dlford.co/repos/cloud-native-next.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
