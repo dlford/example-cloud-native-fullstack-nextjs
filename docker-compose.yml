@@ -23,7 +23,7 @@ services:
       context: ./server
       dockerfile: Dockerfile
     environment:
-      - DATABASE_URL=mongodb://db:27017/cloud-native-next
+      - DATABASE_URL=mongodb://db_prod:27017/cloud-native-next
       - PORT=3000
     networks:
       net1:
